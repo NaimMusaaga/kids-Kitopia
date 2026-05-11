@@ -1,0 +1,191 @@
+/* StoryDetail.css - Uyku Masalı Teması */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+
+.story-sleep-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    /* خلفية متدرجة ليلية عميقة ودافئة */
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 40px 20px;
+    font-family: 'Cairo', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* زر الرجوع - شفاف مثل الحلم */
+.back-to-dreams-btn {
+    align-self: flex-start;
+    margin-bottom: 25px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 10px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+    position: relative; z-index: 10;
+}
+
+.back-to-dreams-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: translateX(-5px);
+}
+
+/* كرت القصة الرئيسي - ناعم وزجاجي ليلي */
+.story-sleep-card {
+    max-width: 850px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+    position: relative; z-index: 5;
+    animation: fadeInPage 1.5s ease;
+}
+
+/* صورة الهيدر */
+.sleep-header-image {
+    position: relative;
+    width: 100%;
+    height: 380px;
+}
+
+.sleep-header-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8; /* تعتيم الصورة قليلاً لتناسب الجو الليلي */
+}
+
+.sleep-overlay-title {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(26, 26, 46, 0.9));
+    padding: 40px 30px 25px;
+    color: white;
+}
+
+.sleep-overlay-title h1 {
+    font-size: 2.8rem;
+    font-weight: 900;
+    margin: 0;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+}
+
+.story-author {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    margin: 10px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* قسم المحتوى */
+.sleep-content-section {
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* مشغل الصوت السحري */
+.dream-audio-container {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 25px;
+    border-radius: 30px;
+    margin-bottom: 35px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+}
+
+.dream-audio-container h3 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #fdd835; /* أصفر قمري ناعم */
+    font-size: 1.5rem;
+}
+
+.sleep-audio-player {
+    width: 100%;
+    height: 45px;
+    margin-top: 20px;
+    border-radius: 50px;
+    opacity: 0.8;
+    transition: 0.3s;
+}
+
+.sleep-audio-player:hover { opacity: 1; }
+
+/* نص القصة */
+.story-text-body {
+    font-size: 1.3rem;
+    line-height: 2.1;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 25px;
+    white-space: pre-line;
+}
+
+/* النجوم الخلفية المتلألئة */
+.dream-star {
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    opacity: 0;
+    animation: twinkleStar 3s infinite ease-in-out;
+}
+
+/* شاشات التحميل والحلم */
+.dream-loading, .dream-error {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.8rem;
+    background: #1a1a2e;
+    gap: 20px;
+    font-family: 'Cairo', sans-serif;
+}
+
+.spinning-moon { font-size: 4rem; color: #fdd835; animation: spinning 4s linear infinite; }
+
+/* Animations */
+@keyframes twinkleStar {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+@keyframes spinning { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+@keyframes fadeInPage { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+/* التجاوب مع الجوال */
+@media (max-width: 768px) {
+    .sleep-header-image { height: 250px; }
+    .sleep-overlay-title h1 { font-size: 2rem; }
+    .sleep-content-section { padding: 20px; }
+    .story-text-body { font-size: 1.1rem; line-height: 1.9; padding: 20px; }
+}
+
+/* توزيع النجوم عشوائياً (اختياري، يفضل عمله بـ JS ليكون عشوائي حقاً) */
+.star-1 { top: 10%; left: 10%; animation-delay: 0s; }
+.star-2 { top: 20%; left: 80%; animation-delay: 0.5s; }
+.star-3 { top: 70%; left: 15%; animation-delay: 1s; }
+.star-4 { top: 80%; left: 85%; animation-delay: 1.5s; }
+/* ... أضف المزيد من النجوم حسب الحاجة */

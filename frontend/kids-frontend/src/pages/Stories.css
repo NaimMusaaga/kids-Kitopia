@@ -1,0 +1,159 @@
+/* Stories.css - Magical Stories Version */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+
+.stories-page-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  background-image: url('../assets/view-3d-forest-landscape-with-mountains-sky.jpg'); /* نفس خلفية الغابة */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding: 40px 20px;
+  font-family: 'Cairo', sans-serif;
+}
+
+.stories-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.stories-title {
+  color: white;
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 40px;
+  text-shadow: 2px 4px 15px rgba(0,0,0,0.6);
+}
+
+/* توزيع الشبكة: 4 كروت للابتوب */
+.stories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  perspective: 1500px;
+}
+
+/* حجم كرت القصة */
+.story-flip-card {
+  height: 300px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.story-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.story-flip-card:hover .story-card-inner {
+  transform: rotateY(180deg) translateY(-10px);
+}
+
+.story-card-front, .story-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* الوجه الأمامي (شفافية زجاجية) */
+.story-card-front {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.story-thumbnail-box {
+  position: relative;
+  width: 100%;
+  height: 65%;
+}
+
+.story-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.read-badge {
+  position: absolute;
+  bottom: 10px; right: 10px;
+  background: #ffcc00;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.story-title-text {
+  padding: 12px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-shadow: 1px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* الوجه الخلفي (تدرج لوني جذاب) */
+.story-card-back {
+  background: linear-gradient(135deg, #ff7a18 0%, #ffb347 100%);
+  color: white;
+  transform: rotateY(180deg);
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.back-content h3 { font-size: 1.3rem; margin-bottom: 10px; font-weight: 900; }
+.back-content p { font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; }
+
+.read-now-btn {
+  background: white;
+  color: #ff7a18;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 50px;
+  font-weight: 900;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.read-now-btn:hover {
+  transform: scale(1.1);
+  background: #333;
+  color: white;
+}
+
+/* شاشة التحميل */
+.loading-screen {
+  height: 100vh;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 1.5rem; color: white; background: #ff7a18;
+}
+
+/* التجاوب مع الجوال (كرتين) */
+@media (max-width: 600px) {
+  .stories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 10px;
+  }
+  .stories-title { font-size: 1.8rem; }
+  .story-flip-card { height: 260px; }
+  .story-title-text { font-size: 0.9rem; }
+}
+
+/* التجاوب مع التابلت (3 كروت) */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .stories-grid { grid-template-columns: repeat(3, 1fr); }
+}

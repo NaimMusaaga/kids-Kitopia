@@ -1,0 +1,160 @@
+/* Dashboard.css */
+.dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8f9fc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+  color: white;
+  padding: 20px 0;
+  transition: all 0.3s;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 20px;
+}
+
+.sidebar-nav ul { list-style: none; padding: 0; }
+.sidebar-nav li { margin: 5px 15px; border-radius: 8px; }
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  padding: 12px 15px;
+  font-weight: 500;
+}
+
+.sidebar-nav li:hover, .sidebar-nav li.active {
+  background: rgba(255,255,255,0.15);
+}
+.sidebar-nav li.active a, .sidebar-nav li:hover a { color: white; }
+
+/* Main Content */
+.dashboard-content { flex: 1; display: flex; flex-direction: column; }
+.content-header {
+  background: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.inner-page { padding: 30px; }
+.back-home {
+  text-decoration: none;
+  background: #f1f3f9;
+  color: #4e73df;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+/* Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.stat-title { font-size: 0.8rem; font-weight: bold; color: #4e73df; text-transform: uppercase; }
+.stat-number { font-size: 1.8rem; font-weight: bold; color: #5a5c69; display: block; }
+.stat-icon { font-size: 2.2rem; opacity: 0.3; }
+/* Dashboard Clean UI */
+.admin-content-wrapper { padding: 30px; background: #f4f7f6; }
+.admin-header { margin-bottom: 30px; }
+.admin-header h1 { color: #2c3e50; font-size: 2rem; display: flex; align-items: center; gap: 10px; }
+.admin-header p { color: #7f8c8d; }
+
+.admin-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; align-items: start; }
+
+.admin-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  overflow: hidden;
+  border: 1px solid #edf2f7;
+}
+
+.card-header {
+  background: #4e73df;
+  color: white;
+  padding: 15px 25px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.list-header { background: #1cc88a; }
+
+.admin-form { padding: 25px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; color: #4e73df; font-weight: 600; font-size: 0.9rem; }
+.form-group input {
+  width: 100%; padding: 12px; border: 1px solid #d1d3e2; border-radius: 8px; outline: none;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.admin-btn {
+  width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: 0.3s;
+}
+
+.admin-btn.primary { background: #4e73df; color: white; }
+.admin-btn.primary:hover { background: #224abe; }
+
+.modern-table { width: 100%; border-collapse: collapse; }
+.modern-table th { padding: 15px; text-align: left; background: #f8f9fc; color: #4e73df; border-bottom: 2px solid #e3e6f0; }
+.modern-table td { padding: 15px; border-bottom: 1px solid #f1f3f9; }
+.video-name { font-weight: 600; color: #2c3e50; }
+
+.admin-btn.danger-sm {
+  background: #e74a3b; color: white; padding: 6px 12px; width: auto; font-size: 0.8rem;
+}
+
+@media (max-width: 1024px) { .admin-grid { grid-template-columns: 1fr; } }
+.role-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.role-badge.admin {
+  background: #ffeeba;
+  color: #856404;
+}
+
+.role-badge.user {
+  background: #d1ecf1;
+  color: #0c5460;
+}

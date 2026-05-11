@@ -1,0 +1,227 @@
+/* Home.css - Full Transparent Version */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+
+/* ضبط الهيكل العام للموقع */
+body, html { 
+    margin: 0; 
+    padding: 0; 
+    width: 100%; 
+    font-family: 'Cairo', sans-serif; 
+    overflow-x: hidden; 
+}
+
+.home-page-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    /* الخلفية الأساسية (صورة الغابة) ثابتة ومستمرة على طول الصفحة */
+    background-image: url('../assets/12uv_20sw_210712.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* =========================
+   1. Hero Section
+========================= */
+.hero-section {
+    width: 100%;
+    height: 90vh;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+    color: white; 
+    position: relative;
+}
+
+.hero-section::before {
+    content: ""; 
+    position: absolute; 
+    top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0, 0, 0, 0.15); /* تعتيم خفيف جداً لإبراز النص العلوي */
+    z-index: 1;
+}
+
+.hero-content { 
+    position: relative; 
+    z-index: 2; 
+    animation: fadeIn 1.5s ease; 
+}
+
+.hero-title { 
+    font-size: 4rem; 
+    font-weight: 900; 
+    text-shadow: 2px 4px 15px rgba(0,0,0,0.6); 
+    margin-bottom: 10px; 
+}
+
+.hero-subtitle { 
+    font-size: 1.8rem; 
+    margin-bottom: 35px; 
+    text-shadow: 1px 2px 8px rgba(0,0,0,0.4); 
+}
+
+.watch-btn {
+    padding: 16px 45px; 
+    font-size: 1.3rem; 
+    font-weight: bold; 
+    background: #ffcc00; 
+    border: none; 
+    border-radius: 50px; 
+    cursor: pointer; 
+    color: #333; 
+    transition: 0.3s; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* =========================
+   2. Categories Section (الشفافية المطلقة)
+========================= */
+.categories-section-new {
+    padding: 40px 20px 80px; /* تم رفع العنوان بتقليل المسافة العلوية */
+    background: transparent; 
+    text-align: center;
+    width: 100%;
+}
+
+.categories-section-new h2 {
+    font-size: 3rem;
+    color: white; 
+    margin-bottom: 60px;
+    text-shadow: 2px 4px 12px rgba(0,0,0,0.5);
+    font-weight: 900;
+}
+
+.categories-grid-new {
+    display: flex; 
+    justify-content: center; 
+    gap: 35px; 
+    flex-wrap: wrap; 
+    max-width: 1200px; 
+    margin: 0 auto;
+    perspective: 1500px; 
+}
+
+/* هيكلية الكروت */
+.flip-card {
+    background-color: transparent;
+    width: 200px;
+    height: 250px; 
+    cursor: pointer;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); 
+    transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg) translateY(-20px);
+}
+
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; 
+    backface-visibility: hidden;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* الوجه الأمامي: شفاف تماماً وبدون حدود */
+.flip-card-front {
+    background: transparent;
+    border: none;
+}
+
+.flip-card-front span { 
+    font-weight: 900; 
+    color: white; 
+    font-size: 1.4rem; 
+    margin-top: 10px;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.9);
+}
+
+/* الوجه الخلفي: بنفسجي شفاف قليلاً عند القلب */
+.flip-card-back {
+    background: rgba(108, 92, 231, 0.95);
+    color: white;
+    transform: rotateY(180deg);
+}
+
+/* أيقونات الكاتيجوري */
+.icon-wrapper-front {
+    width: 100px; height: 100px; 
+    border-radius: 28px;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 45px; color: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.colors .icon-wrapper-front { background: linear-gradient(135deg, #ff7a18, #ffb347); }
+.numbers .icon-wrapper-front { background: linear-gradient(135deg, #36d1dc, #5b86e5); }
+.animals .icon-wrapper-front { background: linear-gradient(135deg, #56ab2f, #a8e063); }
+.shapes .icon-wrapper-front  { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+.games .icon-wrapper-front   { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+
+/* =========================
+   3. CTA Section (الآن شفاف تماماً)
+========================= */
+.cta-section-new {
+    width: 100%; 
+    padding: 100px 20px 150px; /* مساحة فسيحة في الأسفل */
+    background: transparent; /* جعل الخلفية شفافة تماماً */
+    text-align: center; 
+    color: white;
+}
+
+.cta-content-new h2 { 
+    font-size: 3.2rem; 
+    margin-bottom: 20px; 
+    font-weight: 900; 
+    text-shadow: 2px 4px 12px rgba(0,0,0,0.6); /* تقوية الظل ليبرز النص فوق الغابة */
+}
+
+.cta-content-new p { 
+    font-size: 1.5rem; 
+    margin-bottom: 45px; 
+    text-shadow: 1px 2px 8px rgba(0,0,0,0.5);
+}
+
+.cta-btn-new {
+    background: #ffcc00; 
+    color: #333; 
+    border: none; 
+    padding: 20px 60px; 
+    font-size: 1.5rem; 
+    font-weight: 900; 
+    border-radius: 60px; 
+    cursor: pointer; 
+    transition: 0.3s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.cta-btn-new:hover {
+    transform: scale(1.1);
+    background-color: white;
+    color: #6c5ce7;
+}
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 768px) {
+    .hero-title { font-size: 2.5rem; }
+    .cta-content-new h2 { font-size: 2.2rem; }
+}
