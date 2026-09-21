@@ -1,28 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaPlay, FaBook, FaGamepad, FaArrowRight, FaShieldAlt, FaMobileAlt, FaSmile } from 'react-icons/fa';
-import api from '../api';
-import { getThumbnail } from '../utils/media';
+import api, { recordWatch } from '../api';
 import { useAuth } from '../context/auth-context';
-import Thumb from '../components/Thumb';
+import { useLanguage } from '../i18n/language-context';
+import VideoCard from '../components/VideoCard';
 import VideoModal from '../components/VideoModal';
 import './Home.css';
-
-const FEATURES = [
-  { to: '/videos', icon: <FaPlay />, tone: 'brand', title: 'Videolar', desc: 'Eğlenirken öğreten, çocuklara özel seçilmiş videolar.' },
-  { to: '/stories', icon: <FaBook />, tone: 'mint', title: 'Sesli Masallar', desc: 'Uyku öncesi dinlenecek sıcacık masallar.' },
-  { to: '/games', icon: <FaGamepad />, tone: 'coral', title: 'Oyunlar', desc: 'Balon patlat, sayı ve renk yarışmasına katıl!' },
-];
-
-const PERKS = [
-  { icon: <FaShieldAlt />, title: 'Güvenli', desc: 'Reklamsız ve çocuklara uygun içerik.' },
-  { icon: <FaMobileAlt />, title: 'Her Cihazda', desc: 'Telefon, tablet ve bilgisayarda kusursuz çalışır.' },
-  { icon: <FaSmile />, title: 'Eğlenceli', desc: 'Renkli, sade ve kullanımı kolay tasarım.' },
-];
 
 export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [latest, setLatest] = useState([]);
   const [playing, setPlaying] = useState(null);
 
@@ -32,31 +21,48 @@ export default function Home() {
       .catch(() => setLatest([]));
   }, []);
 
+  const play = (video) => {
+    setPlaying(video);
+    if (user) recordWatch(video.id);
+  };
+
+  const features = [
+    { to: '/videos', icon: <FaPlay />, tone: 'brand', title: t('nav.videos'), desc: t('home.videosDesc') },
+    { to: '/stories', icon: <FaBook />, tone: 'mint', title: t('home.storiesTitle'), desc: t('home.storiesDesc') },
+    { to: '/games', icon: <FaGamepad />, tone: 'coral', title: t('nav.games'), desc: t('home.gamesDesc') },
+  ];
+
+  const perks = [
+    { icon: <FaShieldAlt />, title: t('home.perkSafeTitle'), desc: t('home.perkSafeDesc') },
+    { icon: <FaMobileAlt />, title: t('home.perkDeviceTitle'), desc: t('home.perkDeviceDesc') },
+    { icon: <FaSmile />, title: t('home.perkFunTitle'), desc: t('home.perkFunDesc') },
+  ];
+
   return (
     <div className="home-page">
       {/* Hero */}
       <section className="hero-section">
         <div className="hero-content container">
-          <span className="hero-pill">🌈 Çocuklar için güvenli eğlence</span>
+          <span className="hero-pill">{t('home.pill')}</span>
           <h1 className="hero-title">Kitopia</h1>
-          <p className="hero-subtitle">Çocuğunuzla en güzel masalların, videoların ve oyunların tadını çıkarın!</p>
+          <p className="hero-subtitle">{t('home.subtitle')}</p>
           <div className="hero-actions">
-            <button className="btn btn-sun btn-lg" onClick={() => navigate('/videos')}><FaPlay /> Videoları İzle</button>
-            <button className="btn btn-ghost btn-lg" onClick={() => navigate('/stories')}><FaBook /> Masalları Dinle</button>
+            <button className="btn btn-sun btn-lg" onClick={() => navigate('/videos')}><FaPlay /> {t('home.watch')}</button>
+            <button className="btn btn-ghost btn-lg" onClick={() => navigate('/stories')}><FaBook /> {t('home.listen')}</button>
           </div>
         </div>
       </section>
 
       {/* Features */}
       <section className="section container">
-        <h2 className="section-title">Neler Var?</h2>
+        <h2 className="section-title">{t('home.whatsInside')}</h2>
         <div className="feature-grid">
-          {FEATURES.map((f) => (
+          {features.map((f) => (
             <Link key={f.to} to={f.to} className={`feature-card tone-${f.tone}`}>
               <span className="feature-icon">{f.icon}</span>
               <h3>{f.title}</h3>
               <p>{f.desc}</p>
-              <span className="feature-link">Keşfet <FaArrowRight /></span>
+              <span className="feature-link">{t('home.explore')} <FaArrowRight className="flip-rtl" /></span>
             </Link>
           ))}
         </div>
@@ -66,21 +72,11 @@ export default function Home() {
       {latest.length > 0 && (
         <section className="section container">
           <div className="section-head">
-            <h2 className="section-title">Yeni Videolar</h2>
-            <Link to="/videos" className="see-all">Tümünü gör <FaArrowRight /></Link>
+            <h2 className="section-title">{t('home.latest')}</h2>
+            <Link to="/videos" className="see-all">{t('home.seeAll')} <FaArrowRight className="flip-rtl" /></Link>
           </div>
           <div className="card-grid">
-            {latest.map((v) => (
-              <button key={v.id} className="media-card" onClick={() => setPlaying(v)}>
-                <div className="media-thumb">
-                  <Thumb src={getThumbnail(v)} alt={v.title} />
-                  <span className="play-badge"><FaPlay /></span>
-                </div>
-                <div className="media-body">
-                  <h3 className="media-title">{v.title}</h3>
-                </div>
-              </button>
-            ))}
+            {latest.map((v) => <VideoCard key={v.id} video={v} onPlay={play} />)}
           </div>
         </section>
       )}
@@ -88,7 +84,7 @@ export default function Home() {
       {/* Perks */}
       <section className="section container">
         <div className="perk-grid">
-          {PERKS.map((p) => (
+          {perks.map((p) => (
             <div key={p.title} className="perk">
               <span className="perk-icon">{p.icon}</span>
               <div>
@@ -104,9 +100,9 @@ export default function Home() {
       {!user && (
         <section className="container">
           <div className="cta-box">
-            <h2>Eğlence Dünyasına Katıl!</h2>
-            <p>Harika masallar ve oyunlar seni bekliyor. Hemen ücretsiz kayıt ol.</p>
-            <button className="btn btn-sun btn-lg" onClick={() => navigate('/register')}>Kayıt Ol</button>
+            <h2>{t('home.ctaTitle')}</h2>
+            <p>{t('home.ctaText')}</p>
+            <button className="btn btn-sun btn-lg" onClick={() => navigate('/register')}>{t('nav.register')}</button>
           </div>
         </section>
       )}

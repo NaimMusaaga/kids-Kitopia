@@ -20,7 +20,7 @@
 .auth-card h1 { font-size: 1.9rem; margin: 0; }
 .auth-sub { color: var(--muted); margin: -8px 0 4px; }
 
-.auth-field { display: flex; flex-direction: column; gap: 6px; text-align: left; font-weight: 700; font-size: 0.92rem; }
+.auth-field { display: flex; flex-direction: column; gap: 6px; text-align: start; font-weight: 700; font-size: 0.92rem; }
 .auth-field input {
   padding: 13px 16px; border: 2px solid var(--line); border-radius: var(--radius-sm);
   background: var(--bg); font-weight: 600; outline: none;
@@ -33,3 +33,10 @@
 .auth-switch { margin: 4px 0 0; color: var(--muted); }
 .auth-switch a { color: var(--brand); font-weight: 800; text-decoration: none; }
 .auth-switch a:hover { text-decoration: underline; }
+
+.auth-field select {
+  padding: 13px 16px; border: 2px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--bg); font-weight: 600; outline: none; width: 100%;
+}
+.auth-field select:focus { border-color: var(--brand); background: #fff; }
+.auth-field small { color: var(--muted); font-weight: 600; }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaArrowLeft, FaMoon, FaStar, FaBed } from 'react-icons/fa';
 import api from '../api';
+import { useLanguage } from '../i18n/language-context';
 import { getThumbnail, getVideoSource, getAudioSource } from '../utils/media';
 import './StoryDetail.css';
 
@@ -20,6 +21,7 @@ export default function StoryDetail() {
 }
 
 function StoryView({ id }) {
+  const { t } = useLanguage();
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,15 +37,15 @@ function StoryView({ id }) {
   if (loading) return (
     <div className="dream-state">
       <FaMoon className="spinning-moon" />
-      <span>Tatlı rüyalar hazırlanıyor...</span>
+      <span>{t('story.loading')}</span>
     </div>
   );
 
   if (!story) return (
     <div className="dream-state">
       <FaStar />
-      <span>Hoppala! Bu masal uykuya dalmış galiba. Bulamadık.</span>
-      <Link to="/stories" className="btn btn-sun">Masallara Dön</Link>
+      <span>{t('story.notFound')}</span>
+      <Link to="/stories" className="btn btn-sun">{t('story.backToStories')}</Link>
     </div>
   );
 
@@ -59,14 +61,14 @@ function StoryView({ id }) {
       ))}
 
       <div className="container story-inner">
-        <Link to="/stories" className="back-to-dreams-btn"><FaArrowLeft /> Masal Diyarına Dön</Link>
+        <Link to="/stories" className="back-to-dreams-btn"><FaArrowLeft className="flip-rtl" /> {t('story.back')}</Link>
 
         <article className="story-sleep-card">
           <header className={`sleep-header${cover ? '' : ' no-cover'}`}>
             {cover && <img src={cover} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
             <div className="sleep-overlay-title">
               <h1>{story.title}</h1>
-              <p className="story-author"><FaBed /> {story.author || 'Kitopia Masalcısı'}</p>
+              <p className="story-author"><FaBed /> {story.author || t('stories.author')}</p>
             </div>
           </header>
 
@@ -84,15 +86,15 @@ function StoryView({ id }) {
 
             {audioSrc && (
               <div className="dream-audio-container">
-                <h3><FaMoon /> Masalı Dinle ve Uyu</h3>
+                <h3><FaMoon /> {t('story.listen')}</h3>
                 <audio controls preload="none" className="sleep-audio-player" src={audioSrc}>
-                  Tarayıcınız ses oynatmayı desteklemiyor.
+                  {t('story.audioUnsupported')}
                 </audio>
               </div>
             )}
 
             <p className="story-text-body">
-              {text || 'Bu masalın sözleri yıldızlara uçmuş! Çok yakında geri dönecekler.'}
+              {text || t('story.noText')}
             </p>
           </div>
         </article>

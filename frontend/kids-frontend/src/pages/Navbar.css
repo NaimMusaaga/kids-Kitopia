@@ -19,7 +19,7 @@
   box-shadow: 0 4px 10px rgba(108, 92, 231, 0.35);
 }
 
-.nav-menu { display: flex; align-items: center; gap: 28px; flex: 1; justify-content: space-between; margin-left: 32px; }
+.nav-menu { display: flex; align-items: center; gap: 28px; flex: 1; justify-content: space-between; margin-inline-start: 32px; }
 .nav-links { display: flex; gap: 6px; }
 .nav-auth { display: flex; align-items: center; gap: 10px; }
 
@@ -31,7 +31,7 @@
 }
 .nav-item:hover, .nav-item.active { background: var(--brand-soft); color: var(--brand); }
 
-.nav-hello { color: var(--muted); font-weight: 700; margin-right: 4px; }
+.nav-hello { color: var(--muted); font-weight: 700; margin-inline-end: 4px; }
 
 .auth-item {
   display: inline-flex; align-items: center; gap: 8px;

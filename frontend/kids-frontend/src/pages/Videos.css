@@ -1,0 +1,25 @@
+.tip-line { text-align: center; margin: 0 0 28px; color: var(--muted); font-weight: 700; }
+.tip-line svg { color: var(--brand); vertical-align: -2px; }
+.tip-line a { color: var(--brand); text-decoration: none; }
+.tip-line a:hover { text-decoration: underline; }
+
+.age-card {
+  max-width: 640px; margin: 0 auto 32px; padding: 22px 24px; text-align: center;
+  background: linear-gradient(135deg, #fff7d6, #ffe9f2); border-radius: var(--radius); box-shadow: var(--shadow-sm);
+}
+.age-card h3 { font-size: 1.3rem; margin-bottom: 4px; }
+.age-card p { color: var(--muted); margin-bottom: 14px; }
+.age-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.age-chips button {
+  width: 46px; height: 46px; border-radius: 50%; border: 2px solid #fff; background: #fff;
+  font-family: var(--font-head); font-weight: 600; font-size: 1.1rem; color: var(--brand);
+  box-shadow: var(--shadow-sm); transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+.age-chips button:hover { transform: translateY(-3px); background: var(--brand); color: #fff; }
+
+.video-row { margin-bottom: 36px; }
+.row-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 16px; }
+.row-head h2 { display: flex; align-items: center; gap: 10px; font-size: clamp(1.2rem, 3.5vw, 1.6rem); margin: 0; }
+.row-head h2 svg { color: var(--brand); }
+.row-head span { color: var(--muted); font-weight: 700; font-size: 0.95rem; }
+.row-head.all { margin-top: 8px; padding-top: 24px; border-top: 2px dashed var(--line); }

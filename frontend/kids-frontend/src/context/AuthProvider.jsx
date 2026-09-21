@@ -24,6 +24,15 @@ export default function AuthProvider({ children }) {
     setUser(u);
   }, []);
 
+  // تحديث بيانات المستخدم المحفوظة (مثل العمر بعد تعديله)
+  const updateUser = useCallback((patch) => {
+    setUser((current) => {
+      const next = { ...current, ...patch };
+      try { localStorage.setItem('user', JSON.stringify(next)); } catch { /* تجاهل */ }
+      return next;
+    });
+  }, []);
+
   const logout = useCallback(() => {
     try {
       localStorage.removeItem('token');
@@ -33,8 +42,8 @@ export default function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, isAdmin: user?.role === 'admin', login, logout }),
-    [user, login, logout]
+    () => ({ user, isAdmin: user?.role === 'admin', login, logout, updateUser }),
+    [user, login, logout, updateUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

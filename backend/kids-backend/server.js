@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const errorHandler = require('./middleware/errorHandler');
 
 // استيراد كافة الـ Routes
@@ -20,7 +21,8 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 
 // Middleware
-app.use(cors());
+// CORS_ORIGIN اختياري (عند نشر الواجهة على دومين مختلف)؛ الافتراضي يسمح للجميع
+app.use(cors(process.env.CORS_ORIGIN ? { origin: process.env.CORS_ORIGIN.split(',') } : undefined));
 app.use(express.json());
 
 // ملفات القصص الصوتية الجاهزة
@@ -37,10 +39,25 @@ app.use('/api/users', userRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
-// Basic Route
-app.get('/', (req, res) => {
-    res.json({ message: "Kids Platform API is running perfectly!" });
-});
+// عند وجود نسخة الواجهة المبنية (npm run build) يخدمها نفس السيرفر، فيكفي نشر خدمة واحدة
+const distPath = path.join(__dirname, '..', '..', 'frontend', 'kids-frontend', 'dist');
+const hasFrontend = fs.existsSync(path.join(distPath, 'index.html'));
+
+if (hasFrontend) {
+    app.use(express.static(distPath));
+} else {
+    app.get('/', (req, res) => {
+        res.json({ message: "Kids Platform API is running perfectly!" });
+    });
+}
+
+// أي مسار غير API يعود لصفحة React (للتنقل داخل الموقع)
+if (hasFrontend) {
+    app.get('/{*splat}', (req, res, next) => {
+        if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/') || req.path.startsWith('/public/')) return next();
+        res.sendFile(path.join(distPath, 'index.html'));
+    });
+}
 
 // معالج الأخطاء
 app.use(errorHandler);

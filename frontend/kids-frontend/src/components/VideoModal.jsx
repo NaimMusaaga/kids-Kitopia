@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { getVideoSource } from '../utils/media';
+import { useLanguage } from '../i18n/language-context';
 import './VideoModal.css';
 
 // يعرض الفيديو داخل الموقع: يوتيوب مدمج (بدون مغادرة الصفحة) أو ملف مرفوع
 export default function VideoModal({ video, onClose }) {
+  const { t } = useLanguage();
   const closeRef = useRef(null);
   const source = getVideoSource(video);
 
@@ -25,7 +27,7 @@ export default function VideoModal({ video, onClose }) {
   return (
     <div className="vm-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label={video.title}>
       <div className="vm-dialog" onClick={(e) => e.stopPropagation()}>
-        <button ref={closeRef} className="vm-close" onClick={onClose} aria-label="Kapat">
+        <button ref={closeRef} className="vm-close" onClick={onClose} aria-label={t('modal.close')}>
           <FaTimes />
         </button>
 
@@ -42,7 +44,7 @@ export default function VideoModal({ video, onClose }) {
             <video src={source.src} controls autoPlay playsInline />
           )}
           {(source.kind === 'external' || source.kind === 'none') && (
-            <div className="vm-unavailable">Bu video şu anda oynatılamıyor 😢</div>
+            <div className="vm-unavailable">{t('modal.unavailable')}</div>
           )}
         </div>
 

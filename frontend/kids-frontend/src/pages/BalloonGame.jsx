@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FaStar, FaClock, FaTrophy, FaArrowLeft } from 'react-icons/fa';
+import { useLanguage } from '../i18n/language-context';
 import './BalloonGame.css';
 
 const ROUND_SECONDS = 30;
@@ -10,6 +11,7 @@ function loadBest() {
 }
 
 export default function BalloonGame() {
+  const { t, dir } = useLanguage();
   const [status, setStatus] = useState('idle'); // idle | playing | over
   const [balloons, setBalloons] = useState([]);
   const [score, setScore] = useState(0);
@@ -30,13 +32,13 @@ export default function BalloonGame() {
   useEffect(() => {
     if (status !== 'playing') return;
     const timer = setInterval(() => {
-      setTimeLeft((t) => {
-        if (t <= 1) {
+      setTimeLeft((left) => {
+        if (left <= 1) {
           clearInterval(timer);
           setStatus('over');
           return 0;
         }
-        return t - 1;
+        return left - 1;
       });
     }, 1000);
     return () => clearInterval(timer);
@@ -90,16 +92,16 @@ export default function BalloonGame() {
   return (
     <div className="game-page">
       <div className="container game-shell">
-        <Link to="/games" className="game-back"><FaArrowLeft /> Oyunlar</Link>
-        <h1>🎈 Balon Patlatma Oyunu</h1>
+        <Link to="/games" className="game-back"><FaArrowLeft className="flip-rtl" /> {t('games.back')}</Link>
+        <h1>{t('balloon.title')}</h1>
 
         <div className="game-hud">
-          <span className="hud-item"><FaStar /> Puan: <strong>{score}</strong></span>
-          <span className="hud-item"><FaClock /> Süre: <strong>{timeLeft}</strong></span>
-          <span className="hud-item"><FaTrophy /> En iyi: <strong>{best}</strong></span>
+          <span className="hud-item"><FaStar /> {t('balloon.score')}: <strong>{score}</strong></span>
+          <span className="hud-item"><FaClock /> {t('balloon.time')}: <strong>{timeLeft}</strong></span>
+          <span className="hud-item"><FaTrophy /> {t('balloon.best')}: <strong>{best}</strong></span>
         </div>
 
-        <div className="game-container">
+        <div className="game-container" dir="ltr">
           {balloons.map((b) => (
             <button
               key={b.id}
@@ -113,23 +115,23 @@ export default function BalloonGame() {
               }}
               onPointerDown={() => !b.popped && pop(b.id)}
               onAnimationEnd={(e) => e.animationName === 'float-up' && remove(b.id)}
-              aria-label="Balonu patlat"
+              aria-label={t('balloon.popAria')}
             />
           ))}
 
           {status !== 'playing' && (
-            <div className="game-overlay">
+            <div className="game-overlay" dir={dir}>
               {status === 'over' ? (
                 <>
-                  <h2>Süre doldu! ⏰</h2>
-                  <p>Toplam <strong>{score}</strong> balon patlattın{score >= best && score > 0 ? ' — yeni rekor! 🏆' : '.'}</p>
-                  <button className="btn btn-sun btn-lg" onClick={start}>Tekrar Oyna</button>
+                  <h2>{t('balloon.timeUp')}</h2>
+                  <p>{score >= best && score > 0 ? t('balloon.record', { n: score }) : t('balloon.result', { n: score })}</p>
+                  <button className="btn btn-sun btn-lg" onClick={start}>{t('balloon.again')}</button>
                 </>
               ) : (
                 <>
-                  <h2>Hazır mısın?</h2>
-                  <p>{ROUND_SECONDS} saniyede olabildiğince çok balon patlat!</p>
-                  <button className="btn btn-sun btn-lg" onClick={start}>Başla</button>
+                  <h2>{t('balloon.ready')}</h2>
+                  <p>{t('balloon.readyText', { n: ROUND_SECONDS })}</p>
+                  <button className="btn btn-sun btn-lg" onClick={start}>{t('balloon.start')}</button>
                 </>
               )}
             </div>

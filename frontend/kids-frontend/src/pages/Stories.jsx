@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { FaBookOpen, FaSearch } from 'react-icons/fa';
 import api from '../api';
 import { getThumbnail } from '../utils/media';
+import { useLanguage } from '../i18n/language-context';
 import Thumb from '../components/Thumb';
 
 export default function Stories() {
+  const { t, lang } = useLanguage();
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -19,16 +21,16 @@ export default function Stories() {
   }, []);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLocaleLowerCase('tr');
-    return q ? stories.filter((s) => s.title?.toLocaleLowerCase('tr').includes(q)) : stories;
-  }, [stories, query]);
+    const q = query.trim().toLocaleLowerCase(lang);
+    return q ? stories.filter((s) => s.title?.toLocaleLowerCase(lang).includes(q)) : stories;
+  }, [stories, query, lang]);
 
   return (
     <div className="page">
       <section className="page-hero">
         <div className="container">
-          <h1>📚 Sihirli Masal Dünyası</h1>
-          <p>Dinle, hayal kur ve tatlı rüyalara dal.</p>
+          <h1>{t('stories.heroTitle')}</h1>
+          <p>{t('stories.heroText')}</p>
         </div>
       </section>
 
@@ -37,23 +39,23 @@ export default function Stories() {
           <FaSearch aria-hidden="true" />
           <input
             type="search"
-            placeholder="Masal ara..."
+            placeholder={t('stories.search')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            aria-label="Masal ara"
+            aria-label={t('stories.search')}
           />
         </label>
 
         {loading && (
-          <div className="state-box"><div className="spinner" />En güzel masallar hazırlanıyor...</div>
+          <div className="state-box"><div className="spinner" />{t('stories.loading')}</div>
         )}
 
         {!loading && error && (
-          <div className="state-box"><span className="state-emoji">😕</span>Masallar yüklenemedi. Lütfen daha sonra tekrar dene.</div>
+          <div className="state-box"><span className="state-emoji">😕</span>{t('stories.error')}</div>
         )}
 
         {!loading && !error && filtered.length === 0 && (
-          <div className="state-box"><span className="state-emoji">🔍</span>{query ? 'Aramanla eşleşen masal bulunamadı.' : 'Henüz masal eklenmemiş.'}</div>
+          <div className="state-box"><span className="state-emoji">🔍</span>{query.trim() ? t('stories.emptySearch') : t('stories.empty')}</div>
         )}
 
         <div className="card-grid">
@@ -61,11 +63,11 @@ export default function Stories() {
             <Link key={story.id} to={`/story/${story.id}`} className="media-card">
               <div className="media-thumb">
                 <Thumb src={getThumbnail(story)} alt={story.title} emoji="📖" />
-                <span className="media-tag"><FaBookOpen /> Masal</span>
+                <span className="media-tag"><FaBookOpen /> {t('stories.tag')}</span>
               </div>
               <div className="media-body">
                 <h3 className="media-title">{story.title}</h3>
-                <p className="media-meta">{story.author || 'Kitopia Masalcısı'}{story.duration ? ` · ${story.duration}` : ''}</p>
+                <p className="media-meta">{story.author || t('stories.author')}{story.duration ? ` · ${story.duration}` : ''}</p>
               </div>
             </Link>
           ))}

@@ -101,7 +101,7 @@
 /* ---------- Table ---------- */
 .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .modern-table { width: 100%; border-collapse: collapse; min-width: 420px; }
-.modern-table th { text-align: left; padding: 14px 20px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); background: var(--bg); }
+.modern-table th { text-align: start; padding: 14px 20px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); background: var(--bg); }
 .modern-table td { padding: 12px 20px; border-top: 1px solid var(--line); vertical-align: middle; }
 .modern-table tr:hover td { background: #fafbff; }
 .text-center { text-align: center !important; }
@@ -133,3 +133,16 @@
   .form-row { grid-template-columns: 1fr; }
   .modern-table th, .modern-table td { padding: 10px 12px; }
 }
+
+/* ---------- Bulk selection ---------- */
+.bulk-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 10px 20px; background: var(--coral-soft); color: #c0392b; font-weight: 800;
+}
+.check-col { width: 44px; text-align: center !important; }
+.modern-table input[type='checkbox'] { width: 18px; height: 18px; accent-color: var(--brand); cursor: pointer; }
+.modern-table input[type='checkbox']:disabled { cursor: not-allowed; opacity: 0.4; }
+.modern-table tr.row-selected td { background: var(--brand-soft); }
+.cell-email { text-align: end; word-break: break-all; }
+[dir='rtl'] .cell-email { text-align: start; }
+.admin-btn[disabled].danger-sm { opacity: 0.45; cursor: not-allowed; }

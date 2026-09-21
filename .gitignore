@@ -1,4 +1,6 @@
 node_modules/
 .env
-# Database dumps contain personal data
+
+# Database dumps may contain personal data; keep only the clean schema
 database/*.sql
+!database/schema.sql

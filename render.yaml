@@ -1,0 +1,29 @@
+# Render Blueprint: خدمة واحدة تبني الواجهة وتشغّل السيرفر الذي يخدمها مع الـ API.
+# قاعدة البيانات خارجية (مثل TiDB Cloud) وتُملأ قيمها من لوحة Render عند إنشاء الخدمة.
+services:
+  - type: web
+    name: kitopia
+    runtime: node
+    plan: free
+    buildCommand: cd frontend/kids-frontend && npm ci --include=dev && npm run build && cd ../../backend/kids-backend && npm ci
+    startCommand: cd backend/kids-backend && node server.js
+    healthCheckPath: /api/videos
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_SSL
+        value: "true"
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false

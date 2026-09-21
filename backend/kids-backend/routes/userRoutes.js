@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
-const { requireAdmin } = require('../middleware/authMiddleware');
+const { protect, requireAdmin } = require('../middleware/authMiddleware');
+const { parseAge, ageGroupIdFor } = require('../utils/ageGroup');
 
 // لا نُرجع كلمات السر أبداً
 const PUBLIC_COLUMNS = 'id, name, username, age, parent_email, age_group_id, role, created_at';
@@ -13,6 +14,18 @@ const listUsers = async (req, res, next) => {
         res.json(rows);
     } catch (err) { next(err); }
 };
+
+// المستخدم الحالي يحدّد/يعدّل عمر الطفل (لتخصيص التوصيات)
+router.put('/me/age', protect, async (req, res, next) => {
+    try {
+        const age = parseAge(req.body && req.body.age);
+        if (age === null) return res.status(400).json({ success: false, message: "عمر الطفل يجب أن يكون بين 1 و17" });
+
+        const ageGroupId = await ageGroupIdFor(age);
+        await db.query("UPDATE users SET age = ?, age_group_id = ? WHERE id = ?", [age, ageGroupId, req.user.id]);
+        res.json({ success: true, age, age_group_id: ageGroupId });
+    } catch (err) { next(err); }
+});
 
 router.get('/', requireAdmin, listUsers);
 router.get('/all', requireAdmin, listUsers);

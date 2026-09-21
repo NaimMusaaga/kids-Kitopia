@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// في التطوير: الباك اند على المنفذ 5000. في الإنتاج: نفس النطاق (السيرفر يخدم الواجهة والـ API معاً)
+// ويمكن تغييره بالمتغير VITE_API_URL عند نشر الواجهة على نطاق منفصل.
+export const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
 const api = axios.create({ baseURL: API_URL });
 
@@ -28,3 +30,6 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// تسجيل مشاهدة فيديو لمستخدم مسجّل (لسجل المشاهدة والتوصيات)؛ الفشل لا يهم
+export const recordWatch = (videoId) => api.post(`/api/videos/${videoId}/watch`).catch(() => {});

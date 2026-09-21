@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaArrowLeft, FaStar, FaTrophy } from 'react-icons/fa';
 import { CATEGORIES, QUIZ_LENGTH, buildQuiz, starsFor } from '../utils/quiz';
+import { useLanguage } from '../i18n/language-context';
 import './QuizGame.css';
 
 const NEXT_DELAY = 1100;
@@ -18,21 +19,22 @@ function saveBest(category, score) {
   try { localStorage.setItem(`quizBest:${category}`, String(score)); } catch { /* تجاهل */ }
 }
 
-function Visual({ visual }) {
+function Visual({ visual, t }) {
   if (visual.type === 'color') {
-    return <div className="quiz-color" style={{ background: visual.hex }} role="img" aria-label="Renk" />;
+    return <div className="quiz-color" style={{ background: visual.hex }} role="img" aria-label={t('quiz.colorAria')} />;
   }
   if (visual.type === 'emojis') {
     return (
-      <div className="quiz-emojis" role="img" aria-label={`${visual.count} tane ${visual.emoji}`}>
+      <div className="quiz-emojis" role="img" aria-label={t('quiz.itemsAria', { n: visual.count })}>
         {Array.from({ length: visual.count }, (_, i) => <span key={i}>{visual.emoji}</span>)}
       </div>
     );
   }
-  return <div className="quiz-sum">{visual.text}</div>;
+  return <div className="quiz-sum" dir="ltr">{visual.text}</div>;
 }
 
 export default function QuizGame() {
+  const { t } = useLanguage();
   const [phase, setPhase] = useState('menu'); // menu | playing | done
   const [category, setCategory] = useState('mix');
   const [questions, setQuestions] = useState([]);
@@ -56,8 +58,8 @@ export default function QuizGame() {
 
   const answer = (option) => {
     if (picked !== null) return;
-    const question = questions[index];
-    const correct = option.value === question.answer;
+    const q = questions[index];
+    const correct = option.value === q.answer;
     const newScore = correct ? score + 1 : score;
     setPicked(option.value);
     if (correct) setScore(newScore);
@@ -80,21 +82,21 @@ export default function QuizGame() {
   const stars = starsFor(score);
 
   return (
-    <div className="game-page quiz-page">
+    <div className="quiz-page">
       <div className="container quiz-shell">
-        <Link to="/games" className="quiz-back"><FaArrowLeft /> Oyunlar</Link>
+        <Link to="/games" className="quiz-back"><FaArrowLeft className="flip-rtl" /> {t('games.back')}</Link>
 
         {phase === 'menu' && (
           <div className="quiz-panel quiz-menu">
-            <h1>🧠 Sayı ve Renk Yarışması</h1>
-            <p>{QUIZ_LENGTH} soruyu doğru cevapla, yıldızları topla!</p>
+            <h1>{t('quiz.title')}</h1>
+            <p>{t('quiz.sub', { n: QUIZ_LENGTH })}</p>
             <div className="quiz-cats">
               {CATEGORIES.map((c) => (
                 <button key={c.id} className="quiz-cat" onClick={() => start(c.id)}>
                   <span className="quiz-cat-emoji">{c.emoji}</span>
-                  <strong>{c.title}</strong>
-                  <span>{c.desc}</span>
-                  <span className="quiz-cat-best"><FaTrophy /> En iyi: {best[c.id]}/{QUIZ_LENGTH}</span>
+                  <strong>{t(`quiz.cat.${c.id}`)}</strong>
+                  <span>{t(`quiz.cat.${c.id}Desc`)}</span>
+                  <span className="quiz-cat-best"><FaTrophy /> {t('quiz.best', { best: best[c.id], total: QUIZ_LENGTH })}</span>
                 </button>
               ))}
             </div>
@@ -104,15 +106,15 @@ export default function QuizGame() {
         {phase === 'playing' && question && (
           <div className="quiz-panel">
             <div className="quiz-top">
-              <span>Soru {index + 1}/{questions.length}</span>
+              <span>{t('quiz.question', { i: index + 1, n: questions.length })}</span>
               <span className="quiz-score"><FaStar /> {score}</span>
             </div>
             <div className="quiz-progress" role="progressbar" aria-valuemin={0} aria-valuemax={questions.length} aria-valuenow={index + 1}>
               <div style={{ width: `${((index + 1) / questions.length) * 100}%` }} />
             </div>
 
-            <h2 className="quiz-prompt">{question.prompt}</h2>
-            <Visual visual={question.visual} />
+            <h2 className="quiz-prompt">{t(question.prompt)}</h2>
+            <Visual visual={question.visual} t={t} />
 
             <div className="quiz-options">
               {question.options.map((o) => {
@@ -123,28 +125,28 @@ export default function QuizGame() {
                 }
                 return (
                   <button key={o.label} className={`quiz-option${state}`} onClick={() => answer(o)} disabled={picked !== null}>
-                    {o.label}
+                    {o.translate ? t(o.label) : o.label}
                   </button>
                 );
               })}
             </div>
 
             <p className="quiz-feedback" aria-live="polite">
-              {picked === null ? ' ' : picked === question.answer ? 'Harika! 🎉' : 'Olsun, bir dahaki sefere! 💪'}
+              {picked === null ? ' ' : picked === question.answer ? t('quiz.correct') : t('quiz.wrong')}
             </p>
           </div>
         )}
 
         {phase === 'done' && (
           <div className="quiz-panel quiz-result">
-            <div className="quiz-stars" aria-label={`${stars} yıldız`}>
+            <div className="quiz-stars" aria-label={t('quiz.starsAria', { n: stars })}>
               {[1, 2, 3].map((n) => <FaStar key={n} className={n <= stars ? 'on' : ''} />)}
             </div>
-            <h2>{score >= 9 ? 'Muhteşem!' : score >= 6 ? 'Aferin sana!' : 'Güzel deneme!'}</h2>
-            <p>{QUIZ_LENGTH} sorunun <strong>{score}</strong> tanesini doğru bildin.</p>
+            <h2>{score >= 9 ? t('quiz.amazing') : score >= 6 ? t('quiz.wellDone') : t('quiz.niceTry')}</h2>
+            <p>{t('quiz.resultText', { score, n: QUIZ_LENGTH })}</p>
             <div className="quiz-result-actions">
-              <button className="btn btn-sun btn-lg" onClick={() => start(category)}>Tekrar Oyna</button>
-              <button className="btn btn-brand btn-lg" onClick={() => setPhase('menu')}>Kategoriler</button>
+              <button className="btn btn-sun btn-lg" onClick={() => start(category)}>{t('quiz.again')}</button>
+              <button className="btn btn-brand btn-lg" onClick={() => setPhase('menu')}>{t('quiz.categories')}</button>
             </div>
           </div>
         )}

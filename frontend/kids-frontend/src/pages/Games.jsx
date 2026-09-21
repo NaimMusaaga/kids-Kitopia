@@ -1,33 +1,22 @@
 import { Link } from 'react-router-dom';
 import { FaPlay } from 'react-icons/fa';
+import { useLanguage } from '../i18n/language-context';
 import './Games.css';
 
 const GAMES = [
-  {
-    to: '/games/quiz',
-    emoji: '🧠',
-    tone: 'brand',
-    title: 'Sayı ve Renk Yarışması',
-    desc: 'Say, topla, renkleri tanı ve yıldızları topla!',
-    tag: 'Öğreten oyun',
-  },
-  {
-    to: '/balloon-game',
-    emoji: '🎈',
-    tone: 'coral',
-    title: 'Balon Patlatma',
-    desc: '30 saniyede olabildiğince çok balon patlat.',
-    tag: 'Hızlı oyun',
-  },
+  { to: '/games/quiz', emoji: '🧠', tone: 'brand', key: 'quiz' },
+  { to: '/balloon-game', emoji: '🎈', tone: 'coral', key: 'balloon' },
 ];
 
 export default function Games() {
+  const { t } = useLanguage();
+
   return (
     <div className="page">
       <section className="page-hero">
         <div className="container">
-          <h1>🎮 Oyun Zamanı</h1>
-          <p>Eğlen, öğren ve rekorlarını kır!</p>
+          <h1>{t('games.heroTitle')}</h1>
+          <p>{t('games.heroText')}</p>
         </div>
       </section>
 
@@ -37,10 +26,10 @@ export default function Games() {
             <Link key={g.to} to={g.to} className={`game-card tone-${g.tone}`}>
               <span className="game-card-art">{g.emoji}</span>
               <div className="game-card-body">
-                <span className="game-card-tag">{g.tag}</span>
-                <h3>{g.title}</h3>
-                <p>{g.desc}</p>
-                <span className="game-card-play"><FaPlay /> Oyna</span>
+                <span className="game-card-tag">{t(`games.${g.key}Tag`)}</span>
+                <h3>{t(`games.${g.key}Title`)}</h3>
+                <p>{t(`games.${g.key}Desc`)}</p>
+                <span className="game-card-play"><FaPlay /> {t('games.play')}</span>
               </div>
             </Link>
           ))}

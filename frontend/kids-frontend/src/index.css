@@ -107,20 +107,20 @@ button { cursor: pointer; }
 /* ---------- Search ---------- */
 .search-bar { position: relative; max-width: 460px; margin: -22px auto 28px; z-index: 2; }
 .search-bar input {
-  width: 100%; padding: 14px 20px 14px 48px;
+  width: 100%; padding: 14px 20px; padding-inline-start: 48px;
   border: 2px solid transparent; border-radius: 999px;
   background: var(--surface); box-shadow: var(--shadow-md);
   font-size: 1rem; outline: none; transition: border-color 0.15s;
 }
 .search-bar input:focus { border-color: var(--brand); }
-.search-bar svg { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.search-bar svg { position: absolute; inset-inline-start: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); }
 
 /* ---------- Card grid + media cards (videos & stories) ---------- */
 .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
 
 .media-card {
   display: flex; flex-direction: column; width: 100%;
-  padding: 0; text-align: left; text-decoration: none; color: inherit;
+  padding: 0; text-align: start; text-decoration: none; color: inherit;
   background: var(--surface); border: 0; border-radius: var(--radius);
   overflow: hidden; box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -149,7 +149,7 @@ button { cursor: pointer; }
 .media-card:hover .play-badge { transform: scale(1.12); opacity: 1; }
 
 .media-tag {
-  position: absolute; top: 12px; left: 12px;
+  position: absolute; top: 12px; inset-inline-start: 12px;
   background: rgba(30, 42, 74, 0.75); color: #fff;
   padding: 3px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 700;
   backdrop-filter: blur(4px);
@@ -182,3 +182,8 @@ button { cursor: pointer; }
   .card-grid { grid-template-columns: 1fr; gap: 18px; }
   .btn-lg { padding: 13px 26px; font-size: 1rem; }
 }
+
+/* ---------- Languages / RTL ---------- */
+html[lang='ar'] { --font-head: 'Cairo', 'Fredoka', system-ui, sans-serif; --font-body: 'Cairo', 'Nunito', system-ui, sans-serif; }
+html[lang='ar'] h1, html[lang='ar'] h2, html[lang='ar'] h3, html[lang='ar'] h4 { line-height: 1.45; }
+[dir='rtl'] .flip-rtl { transform: scaleX(-1); }

@@ -1,22 +1,23 @@
 // مولّد أسئلة لعبة الأرقام والألوان (دوال نقية، تُستدعى عند بدء الجولة فقط)
+// النصوص هنا مفاتيح ترجمة؛ الواجهة تترجمها حسب لغة المستخدم.
 
 export const QUIZ_LENGTH = 10;
 
 export const CATEGORIES = [
-  { id: 'mix', title: 'Karışık', emoji: '🎲', desc: 'Sayılar ve renkler bir arada!' },
-  { id: 'numbers', title: 'Sayılar', emoji: '🔢', desc: 'Say ve topla.' },
-  { id: 'colors', title: 'Renkler', emoji: '🎨', desc: 'Renkleri tanı.' },
+  { id: 'mix', emoji: '🎲' },
+  { id: 'numbers', emoji: '🔢' },
+  { id: 'colors', emoji: '🎨' },
 ];
 
 const COLORS = [
-  { name: 'Kırmızı', hex: '#e63946' },
-  { name: 'Mavi', hex: '#1d7cf2' },
-  { name: 'Sarı', hex: '#ffd23f' },
-  { name: 'Yeşil', hex: '#2fbf71' },
-  { name: 'Turuncu', hex: '#ff8c1a' },
-  { name: 'Mor', hex: '#8e44ad' },
-  { name: 'Pembe', hex: '#ff6fa5' },
-  { name: 'Kahverengi', hex: '#8d5a2b' },
+  { key: 'red', hex: '#e63946' },
+  { key: 'blue', hex: '#1d7cf2' },
+  { key: 'yellow', hex: '#ffd23f' },
+  { key: 'green', hex: '#2fbf71' },
+  { key: 'orange', hex: '#ff8c1a' },
+  { key: 'purple', hex: '#8e44ad' },
+  { key: 'pink', hex: '#ff6fa5' },
+  { key: 'brown', hex: '#8d5a2b' },
 ];
 
 const OBJECTS = ['🍎', '⭐', '🎈', '🐟', '🚗', '🌸', '🍓', '🐥'];
@@ -46,7 +47,7 @@ function numberOptions(answer) {
 function countQuestion() {
   const count = randInt(1, 10);
   return {
-    prompt: 'Kaç tane var?',
+    prompt: 'quiz.qCount',
     visual: { type: 'emojis', emoji: pick(OBJECTS), count },
     options: numberOptions(count),
     answer: count,
@@ -57,7 +58,7 @@ function addQuestion() {
   const a = randInt(1, 6);
   const b = randInt(1, 10 - a);
   return {
-    prompt: 'Toplamı kaçtır?',
+    prompt: 'quiz.qAdd',
     visual: { type: 'text', text: `${a} + ${b} = ?` },
     options: numberOptions(a + b),
     answer: a + b,
@@ -67,10 +68,10 @@ function addQuestion() {
 function colorQuestion() {
   const [correct, ...others] = shuffle(COLORS);
   return {
-    prompt: 'Bu renk hangisi?',
+    prompt: 'quiz.qColor',
     visual: { type: 'color', hex: correct.hex },
-    options: shuffle([correct, ...others.slice(0, 3)]).map((c) => ({ label: c.name, value: c.name })),
-    answer: correct.name,
+    options: shuffle([correct, ...others.slice(0, 3)]).map((c) => ({ label: `color.${c.key}`, value: c.key, translate: true })),
+    answer: correct.key,
   };
 }
 
