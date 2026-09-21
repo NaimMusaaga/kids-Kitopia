@@ -2,11 +2,11 @@
 
 - **frontend/kids-frontend**: React 19 + Vite (الواجهة بالتركية، متجاوبة مع كل الشاشات)
 - **backend/kids-backend**: Express 5 + MySQL + JWT
-- **database/kids_platform.sql**: هيكل وبيانات قاعدة البيانات
+- **قاعدة البيانات**: ملف الـ SQL غير مرفوع على المستودع لأنه يحتوي بيانات شخصية (يُحفظ محلياً في `database/`)
 
 ## التشغيل محلياً
 
-1. استورد `database/kids_platform.sql` في MySQL (XAMPP → phpMyAdmin).
+1. استورد ملف قاعدة البيانات `kids_platform.sql` في MySQL (XAMPP → phpMyAdmin).
 2. الباك اند:
    ```bash
    cd backend/kids-backend
