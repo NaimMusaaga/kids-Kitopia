@@ -53,7 +53,6 @@ CREATE TABLE IF NOT EXISTS `videos` (
   KEY `age_group_id` (`age_group_id`),
   KEY `fk_category` (`category_id`),
   CONSTRAINT `fk_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `videos_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
   CONSTRAINT `videos_ibfk_2` FOREIGN KEY (`age_group_id`) REFERENCES `agegroups` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 CREATE TABLE IF NOT EXISTS `watchhistory` (

@@ -5,6 +5,7 @@ services:
     name: kitopia
     runtime: node
     plan: free
+    region: frankfurt
     buildCommand: cd frontend/kids-frontend && npm ci --include=dev && npm run build && cd ../../backend/kids-backend && npm ci
     startCommand: cd backend/kids-backend && node server.js
     healthCheckPath: /api/videos
