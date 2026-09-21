@@ -1,68 +1,73 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import './Stories.css';
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FaBookOpen, FaSearch } from 'react-icons/fa';
+import api from '../api';
+import { getThumbnail } from '../utils/media';
+import Thumb from '../components/Thumb';
 
 export default function Stories() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [error, setError] = useState(false);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
-    const fetchStories = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/stories');
-        setStories(Array.isArray(response.data) ? response.data : []);
-      } catch (err) {
-        console.error("Veri çekme hatası:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStories();
+    api.get('/api/stories')
+      .then((res) => setStories(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="loading-screen">En güzel masallar hazırlanıyor... ⏳</div>;
+  const filtered = useMemo(() => {
+    const q = query.trim().toLocaleLowerCase('tr');
+    return q ? stories.filter((s) => s.title?.toLocaleLowerCase('tr').includes(q)) : stories;
+  }, [stories, query]);
 
   return (
-    <div className="stories-page-wrapper">
-      <div className="stories-container">
-        <h1 className="stories-title">📚 Sihirli Masal Dünyası</h1>
-        
-        <div className="stories-grid">
-          {stories.map((story) => (
-            <div key={story.id} className="story-flip-card">
-              <div className="story-card-inner">
-                
-                {/* الوجه الأمامي: صورة القصة وعنوانها */}
-                <div className="story-card-front">
-                  <div className="story-thumbnail-box">
-                    <img 
-                      src={story.thumbnail_url || 'https://via.placeholder.com/300x195?text=Masal+Resmi'} 
-                      alt={story.title} 
-                      className="story-thumbnail"
-                    />
-                    <div className="read-badge">📖</div>
-                  </div>
-                  <h3 className="story-title-text">{story.title}</h3>
-                </div>
+    <div className="page">
+      <section className="page-hero">
+        <div className="container">
+          <h1>📚 Sihirli Masal Dünyası</h1>
+          <p>Dinle, hayal kur ve tatlı rüyalara dal.</p>
+        </div>
+      </section>
 
-                {/* الوجه الخلفي: وصف القصة وزر القراءة */}
-                <div className="story-card-back">
-                  <div className="back-content">
-                    <h3>{story.title}</h3>
-                    <p>{story.description || "Bu masalda seni harika maceralar bekliyor. Hemen okumaya başla!"}</p>
-                    <button 
-                      className="read-now-btn"
-                      onClick={() => navigate(`/story/${story.id}`)}
-                    >
-                      Şimdi Oku ✨
-                    </button>
-                  </div>
-                </div>
+      <div className="container page-body">
+        <label className="search-bar">
+          <FaSearch aria-hidden="true" />
+          <input
+            type="search"
+            placeholder="Masal ara..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Masal ara"
+          />
+        </label>
 
+        {loading && (
+          <div className="state-box"><div className="spinner" />En güzel masallar hazırlanıyor...</div>
+        )}
+
+        {!loading && error && (
+          <div className="state-box"><span className="state-emoji">😕</span>Masallar yüklenemedi. Lütfen daha sonra tekrar dene.</div>
+        )}
+
+        {!loading && !error && filtered.length === 0 && (
+          <div className="state-box"><span className="state-emoji">🔍</span>{query ? 'Aramanla eşleşen masal bulunamadı.' : 'Henüz masal eklenmemiş.'}</div>
+        )}
+
+        <div className="card-grid">
+          {filtered.map((story) => (
+            <Link key={story.id} to={`/story/${story.id}`} className="media-card">
+              <div className="media-thumb">
+                <Thumb src={getThumbnail(story)} alt={story.title} emoji="📖" />
+                <span className="media-tag"><FaBookOpen /> Masal</span>
               </div>
-            </div>
+              <div className="media-body">
+                <h3 className="media-title">{story.title}</h3>
+                <p className="media-meta">{story.author || 'Kitopia Masalcısı'}{story.duration ? ` · ${story.duration}` : ''}</p>
+              </div>
+            </Link>
           ))}
         </div>
       </div>

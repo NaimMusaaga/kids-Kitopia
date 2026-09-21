@@ -1,66 +1,49 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const multer = require('multer');
-const path = require('path');
+const { requireAdmin } = require('../middleware/authMiddleware');
+const { uploadAudio } = require('../middleware/upload');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => { cb(null, 'uploads/'); },
-    filename: (req, file, cb) => { cb(null, Date.now() + path.extname(file.originalname)); }
-});
-const upload = multer({ storage: storage });
-
-// مسار إضافة قصة مع رفع ملف صوتي
-router.post('/', upload.single('file'), async (req, res) => {
+const listStories = async (req, res, next) => {
     try {
-        // --- سطر الكشف عن قاعدة البيانات ---
-        const [result] = await db.query("SELECT DATABASE()");
-        console.log("السيرفر متصل حالياً بقاعدة بيانات اسمها:", result[0]['DATABASE()']);
-        // -----------------------------------
-
-        const { title, content } = req.body;
-        const filePath = req.file ? req.file.path : null;
-
-        await db.query("INSERT INTO stories (title, content, file_path) VALUES (?, ?, ?)", 
-            [title, content, filePath]);
-        
-        res.status(201).json({ message: "تمت إضافة القصة مع الملف بنجاح" });
-    } catch (err) {
-        console.error("خطأ في إضافة القصة:", err);
-        res.status(500).json({ error: "خطأ في السيرفر: " + err.message });
-    }
-});
-
-// باقي المسارات (GET, DELETE) كما هي...
-router.get('/', async (req, res) => {
-    try {
-        const [rows] = await db.query("SELECT * FROM stories");
+        const [rows] = await db.query("SELECT * FROM stories ORDER BY id DESC");
         res.json(rows);
-    } catch (err) { res.status(500).json({ error: "خطأ" }); }
-});
+    } catch (err) { next(err); }
+};
 
-router.get('/all', async (req, res) => {
-    try {
-        const [rows] = await db.query("SELECT * FROM stories");
-        res.json(rows);
-    } catch (err) { res.status(500).json({ error: "خطأ" }); }
-});
+// عام: عرض القصص
+router.get('/', listStories);
+router.get('/all', listStories);
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const [rows] = await db.query("SELECT * FROM stories WHERE id = ?", [id]);
+        const [rows] = await db.query("SELECT * FROM stories WHERE id = ?", [req.params.id]);
         if (rows.length === 0) return res.status(404).json({ error: "القصة غير موجودة" });
         res.json(rows[0]);
-    } catch (err) { res.status(500).json({ error: "خطأ" }); }
+    } catch (err) { next(err); }
 });
 
-router.delete('/:id', async (req, res) => {
+// للمدير فقط: إضافة قصة مع ملف صوتي
+router.post('/', requireAdmin, uploadAudio.single('file'), async (req, res, next) => {
     try {
-        const { id } = req.params;
-        await db.query("DELETE FROM stories WHERE id = ?", [id]);
+        const { title, content } = req.body;
+        if (!title || !title.trim()) return res.status(400).json({ success: false, message: "عنوان القصة مطلوب" });
+
+        // مسار بشرطة مائلة عادية ليعمل على كل الأنظمة
+        const filePath = req.file ? `uploads/${req.file.filename}` : null;
+
+        await db.query("INSERT INTO stories (title, content, file_path) VALUES (?, ?, ?)",
+            [title.trim(), content || null, filePath]);
+
+        res.status(201).json({ message: "تمت إضافة القصة مع الملف بنجاح" });
+    } catch (err) { next(err); }
+});
+
+router.delete('/:id', requireAdmin, async (req, res, next) => {
+    try {
+        await db.query("DELETE FROM stories WHERE id = ?", [req.params.id]);
         res.json({ message: "تم الحذف" });
-    } catch (err) { res.status(500).json({ error: "خطأ" }); }
+    } catch (err) { next(err); }
 });
 
 module.exports = router;

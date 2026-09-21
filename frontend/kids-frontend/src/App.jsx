@@ -8,30 +8,28 @@ import Videos from './pages/Videos';
 import Stories from './pages/Stories';
 import StoryDetail from './pages/StoryDetail';
 import BalloonGame from './pages/BalloonGame';
+import Games from './pages/Games';
+import QuizGame from './pages/QuizGame';
+import NotFound from './pages/NotFound';
+import PrivateRoute from './pages/PrivateRoute';
 
-// استدعاء مكونات الداشبورد
+// مكونات الداشبورد
 import DashboardLayout from './pages/DashboardLayout';
 import DashboardHome from './pages/DashboardHome';
 import VideosAdmin from './pages/VideosAdmin';
 import StoriesAdmin from './pages/StoriesAdmin';
 import UsersAdmin from './pages/UsersAdmin';
 
-// هذا المكون يحدد متى نظهر النافبار والفوتر ومتى نخفيهم
+// الداشبورد له تصميمه الخاص، فنخفي النافبار والفوتر هناك فقط
 function Layout({ children }) {
-  const location = useLocation();
-  
-  // نحدد الصفحات التي نريد إخفاء النافبار والفوتر فيها
-  // ملاحظة: أي رابط يبدأ بـ /dashboard سيتم إخفاء النافبار والفوتر فيه
-  const hideElements = 
-    ['/videos', '/stories', '/balloon-game'].includes(location.pathname) || 
-    location.pathname.startsWith('/story/') ||
-    location.pathname.startsWith('/dashboard');
+  const { pathname } = useLocation();
+  const isDashboard = pathname.startsWith('/dashboard');
 
   return (
     <>
-      {!hideElements && <Navbar />}
+      {!isDashboard && <Navbar />}
       {children}
-      {!hideElements && <Footer />}
+      {!isDashboard && <Footer />}
     </>
   );
 }
@@ -47,15 +45,19 @@ function App() {
           <Route path="/videos" element={<Videos />} />
           <Route path="/stories" element={<Stories />} />
           <Route path="/story/:id" element={<StoryDetail />} />
+          <Route path="/games" element={<Games />} />
+          <Route path="/games/quiz" element={<QuizGame />} />
           <Route path="/balloon-game" element={<BalloonGame />} />
-          
-          {/* مسارات الداشبورد المتداخلة */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-             <Route index element={<DashboardHome />} />
-             <Route path="videos" element={<VideosAdmin />} />
-             <Route path="stories" element={<StoriesAdmin />} />
-             <Route path="users" element={<UsersAdmin />} />
+
+          {/* الداشبورد للمدير فقط */}
+          <Route path="/dashboard" element={<PrivateRoute role="admin"><DashboardLayout /></PrivateRoute>}>
+            <Route index element={<DashboardHome />} />
+            <Route path="videos" element={<VideosAdmin />} />
+            <Route path="stories" element={<StoriesAdmin />} />
+            <Route path="users" element={<UsersAdmin />} />
           </Route>
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
     </Router>

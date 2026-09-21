@@ -1,53 +1,59 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/db'); // تأكد من مسار الداتابيس
+const bcrypt = require('bcryptjs');
+const db = require('../config/db');
+const { requireAdmin } = require('../middleware/authMiddleware');
 
-// 1. مسار جلب جميع المستخدمين (للموقع الأساسي)
-router.get('/', async (req, res) => {
+// لا نُرجع كلمات السر أبداً
+const PUBLIC_COLUMNS = 'id, name, username, age, parent_email, age_group_id, role, created_at';
+
+const listUsers = async (req, res, next) => {
     try {
-        const [rows] = await db.query("SELECT * FROM users");
+        const [rows] = await db.query(`SELECT ${PUBLIC_COLUMNS} FROM users ORDER BY id DESC`);
         res.json(rows);
-    } catch (err) {
-        console.error("خطأ في جلب المستخدمين:", err);
-        res.status(500).json({ error: "خطأ في السيرفر" });
-    }
-});
+    } catch (err) { next(err); }
+};
 
-// 2. مسار جلب جميع المستخدمين (للداشبورد - الحل للـ 404)
-router.get('/all', async (req, res) => {
-    try {
-        const [rows] = await db.query("SELECT * FROM users");
-        res.json(rows);
-    } catch (err) {
-        console.error("خطأ في جلب المستخدمين (all):", err);
-        res.status(500).json({ error: "خطأ في السيرفر" });
-    }
-});
+router.get('/', requireAdmin, listUsers);
+router.get('/all', requireAdmin, listUsers);
 
-// 3. مسار إضافة مستخدم جديد
-router.post('/', async (req, res) => {
+router.post('/', requireAdmin, async (req, res, next) => {
     try {
-        const { name, parent_email, password, role } = req.body;
-        // إضافة مستخدم جديد (ملاحظة: تأكد من تشفير كلمة السر في مرحلة الإنتاج)
-        await db.query("INSERT INTO users (name, parent_email, password, role) VALUES (?, ?, ?, ?)", 
-            [name, parent_email, password, role]);
+        const body = req.body || {};
+        const name = body.name && body.name.trim();
+        const email = body.parent_email && body.parent_email.trim();
+        const password = body.password;
+        const role = body.role === 'admin' ? 'admin' : 'user';
+
+        if (!name || !email || !password) {
+            return res.status(400).json({ success: false, message: "الاسم والبريد وكلمة السر مطلوبة" });
+        }
+        if (password.length < 6) {
+            return res.status(400).json({ success: false, message: "كلمة السر يجب ألا تقل عن 6 أحرف" });
+        }
+
+        const [existing] = await db.query("SELECT id FROM users WHERE parent_email = ?", [email]);
+        if (existing.length > 0) {
+            return res.status(409).json({ success: false, message: "هذا البريد مسجل مسبقاً" });
+        }
+
+        const hashed = await bcrypt.hash(password, 10);
+        await db.query(
+            "INSERT INTO users (name, username, age, parent_email, parent_password, role) VALUES (?, ?, ?, ?, ?, ?)",
+            [name, name, 0, email, hashed, role]
+        );
         res.status(201).json({ message: "تم إضافة المستخدم بنجاح" });
-    } catch (err) {
-        console.error("خطأ في إضافة المستخدم:", err);
-        res.status(500).json({ error: "خطأ في السيرفر" });
-    }
+    } catch (err) { next(err); }
 });
 
-// 4. مسار حذف مستخدم
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAdmin, async (req, res, next) => {
     try {
-        const { id } = req.params;
-        await db.query("DELETE FROM users WHERE id = ?", [id]);
+        if (String(req.user.id) === String(req.params.id)) {
+            return res.status(400).json({ success: false, message: "لا يمكنك حذف حسابك الحالي" });
+        }
+        await db.query("DELETE FROM users WHERE id = ?", [req.params.id]);
         res.json({ message: "تم حذف المستخدم بنجاح" });
-    } catch (err) {
-        console.error("خطأ في حذف المستخدم:", err);
-        res.status(500).json({ error: "خطأ في السيرفر" });
-    }
+    } catch (err) { next(err); }
 });
 
 module.exports = router;

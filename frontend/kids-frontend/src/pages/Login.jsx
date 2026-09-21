@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import './Register.css';
+import api from '../api';
+import { useAuth } from '../context/auth-context';
+import './Auth.css';
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,34 +17,46 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setMessage(null);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', formData);
-      localStorage.setItem('token', response.data.token);
-      setMessage('Hoş geldin! Sihirli kapı açılıyor... 🗝️');
-      setTimeout(() => navigate('/'), 2000);
+      const { data } = await api.post('/api/auth/login', formData);
+      login(data);
+      setMessage({ type: 'success', text: 'Hoş geldin! Sihirli kapı açılıyor... 🗝️' });
+      setTimeout(() => navigate(data.user.role === 'admin' ? '/dashboard' : '/'), 800);
     } catch (error) {
-      setMessage('Hoppala! Bilgilerinde bir hata var. 🧐');
+      const status = error.response?.status;
+      setMessage({
+        type: 'error',
+        text: status === 401 ? 'E-posta ya da şifre hatalı. 🧐' : 'Bağlantı kurulamadı, lütfen tekrar dene. 🤖',
+      });
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="register-container">
-      <form onSubmit={handleSubmit} className="register-form">
-        <span className="form-emoji">👋</span>
-        <h2>Giriş Yap</h2>
-        <div className="input-group">
-          <input name="email" type="email" className="input-field" placeholder="E-posta Adresin 📧" onChange={handleChange} required />
-        </div>
-        <div className="input-group">
-          <input name="password" type="password" className="input-field" placeholder="Gizli Şifren 🔑" onChange={handleChange} required />
-        </div>
-        <button type="submit" className="submit-btn">Dünyama Gir ✨</button>
-        
-        <p className="footer-link">
-          Henüz hesabın yok mu? <Link to="/register">Hemen Kayıt Ol!</Link>
-        </p>
+    <div className="auth-page">
+      <form onSubmit={handleSubmit} className="auth-card">
+        <span className="auth-emoji">👋</span>
+        <h1>Giriş Yap</h1>
+        <p className="auth-sub">Kitopia dünyasına geri dön.</p>
 
-        {message && <p style={{color: 'white', marginTop: '15px', fontWeight: 'bold'}}>{message}</p>}
+        <label className="auth-field">
+          <span>E-posta</span>
+          <input name="email" type="email" autoComplete="email" placeholder="ornek@mail.com" onChange={handleChange} required />
+        </label>
+        <label className="auth-field">
+          <span>Şifre</span>
+          <input name="password" type="password" autoComplete="current-password" placeholder="••••••••" onChange={handleChange} required />
+        </label>
+
+        <button type="submit" className="btn btn-brand btn-lg auth-submit" disabled={submitting}>
+          {submitting ? 'Giriş yapılıyor...' : 'Dünyama Gir ✨'}
+        </button>
+
+        {message && <p className={`form-message ${message.type}`} role="status">{message.text}</p>}
+
+        <p className="auth-switch">Henüz hesabın yok mu? <Link to="/register">Hemen Kayıt Ol!</Link></p>
       </form>
     </div>
   );

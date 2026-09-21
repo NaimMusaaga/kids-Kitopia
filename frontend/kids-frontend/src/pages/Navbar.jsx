@@ -1,30 +1,64 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { FaHome, FaPlay, FaBook, FaGamepad, FaLock, FaUserPlus } from 'react-icons/fa';
+import { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { FaPlay, FaBook, FaGamepad, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaBars, FaTimes, FaThLarge } from 'react-icons/fa';
+import { useAuth } from '../context/auth-context';
 import './Navbar.css';
 
 export default function Navbar() {
+  const [open, setOpen] = useState(false);
+  const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
+  // نغلق القائمة عند الضغط على أي رابط أو زر داخلها
+  const closeOnAction = (e) => { if (e.target.closest('a, button')) setOpen(false); };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const linkClass = ({ isActive }) => `nav-item${isActive ? ' active' : ''}`;
+
   return (
-    <nav className="kids-navbar">
-      <div className="nav-container">
-        <div className="nav-logo" onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
-           Kitopia
-        </div>
+    <header className="kids-navbar">
+      <div className="nav-container container">
+        <Link to="/" className="nav-logo" aria-label="Kitopia ana sayfa">
+          <span className="logo-mark">K</span>
+          <span>Kitopia</span>
+        </Link>
 
-        <div className="nav-links">
-          <Link to="/" className="nav-item"><FaHome /> Ana Sayfa</Link>
-          <Link to="/videos" className="nav-item"><FaPlay /> Videolar</Link>
-          <Link to="/stories" className="nav-item"><FaBook /> Hikayeler</Link>
-          {/* الرابط المعدل للعبة */}
-          <Link to="/balloon-game" className="nav-item"><FaGamepad /> Oyunlar</Link>
-        </div>
+        <button
+          className="nav-toggle"
+          onClick={() => setOpen((o) => !o)}
+          aria-label={open ? 'Menüyü kapat' : 'Menüyü aç'}
+          aria-expanded={open}
+        >
+          {open ? <FaTimes /> : <FaBars />}
+        </button>
 
-        <div className="nav-auth">
-          <Link to="/login" className="auth-item"><FaLock /> Giriş</Link>
-          <Link to="/register" className="auth-item signup"><FaUserPlus /> Kayıt</Link>
-        </div>
+        <nav className={`nav-menu${open ? ' open' : ''}`} onClick={closeOnAction}>
+          <div className="nav-links">
+            <NavLink to="/videos" className={linkClass}><FaPlay /> Videolar</NavLink>
+            <NavLink to="/stories" className={linkClass}><FaBook /> Masallar</NavLink>
+            <NavLink to="/games" className={linkClass}><FaGamepad /> Oyunlar</NavLink>
+          </div>
+
+          <div className="nav-auth">
+            {user ? (
+              <>
+                <span className="nav-hello">Merhaba, {user.name}</span>
+                {isAdmin && <Link to="/dashboard" className="auth-item"><FaThLarge /> Panel</Link>}
+                <button className="auth-item" onClick={handleLogout}><FaSignOutAlt /> Çıkış</button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="auth-item"><FaSignInAlt /> Giriş</Link>
+                <Link to="/register" className="auth-item signup"><FaUserPlus /> Kayıt Ol</Link>
+              </>
+            )}
+          </div>
+        </nav>
       </div>
-    </nav>
+    </header>
   );
 }

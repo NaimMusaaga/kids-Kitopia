@@ -1,0 +1,27 @@
+.games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto; }
+
+.game-card {
+  display: flex; flex-direction: column; overflow: hidden;
+  border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow-sm);
+  text-decoration: none; color: var(--ink);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.game-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+
+.game-card-art {
+  display: flex; align-items: center; justify-content: center;
+  height: 150px; font-size: 4.5rem;
+  background: linear-gradient(135deg, var(--tone-soft), #fff);
+  border-bottom: 5px solid var(--tone);
+}
+.game-card:hover .game-card-art { animation: game-wiggle 0.5s ease; }
+@keyframes game-wiggle { 25% { transform: rotate(-4deg) scale(1.05); } 75% { transform: rotate(4deg) scale(1.05); } }
+
+.game-card-body { padding: 18px 22px 24px; display: flex; flex-direction: column; gap: 4px; }
+.game-card-body h3 { font-size: 1.35rem; margin: 4px 0 0; }
+.game-card-body p { color: var(--muted); margin: 0 0 10px; }
+.game-card-tag { align-self: flex-start; background: var(--tone-soft); color: var(--tone); padding: 2px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 800; }
+.game-card-play {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border-radius: 999px; font-weight: 800; color: #fff; background: var(--tone);
+}

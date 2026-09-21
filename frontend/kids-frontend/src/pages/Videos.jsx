@@ -1,75 +1,79 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import './Videos.css';
+import { useEffect, useMemo, useState } from 'react';
+import { FaPlay, FaSearch } from 'react-icons/fa';
+import api from '../api';
+import { getThumbnail } from '../utils/media';
+import Thumb from '../components/Thumb';
+import VideoModal from '../components/VideoModal';
 
 export default function Videos() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [query, setQuery] = useState('');
+  const [playing, setPlaying] = useState(null);
 
   useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        // يبقى الرابط وطلب البيانات كما هو لضمان عمل الـ API
-        const response = await axios.get('http://localhost:5000/api/videos');
-        let data = Array.isArray(response.data) ? response.data : (Object.values(response.data).find(Array.isArray) || []);
-        setVideos(data);
-      } catch (err) {
-        console.error("Veri çekme hatası:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVideos();
+    api.get('/api/videos')
+      .then((res) => setVideos(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="loading-screen">En güzel videolar hazırlanıyor... ⏳</div>;
+  const filtered = useMemo(() => {
+    const q = query.trim().toLocaleLowerCase('tr');
+    return q ? videos.filter((v) => v.title?.toLocaleLowerCase('tr').includes(q)) : videos;
+  }, [videos, query]);
 
   return (
-    <div className="videos-page-wrapper">
-      <div className="videos-container">
-        {/* العنوان بالتركي */}
-        <h1 className="videos-title">🎬 Sihirli Çocuk Sineması</h1>
-        
-        <div className="videos-grid">
-          {videos.map((video) => (
-            <div key={video.id || Math.random()} className="video-flip-card">
-              <div className="video-card-inner">
-                
-                {/* الوجه الأمامي: صورة الفيديو */}
-                <div className="video-card-front">
-                  <div className="thumbnail-box">
-                    <img 
-                      src={video.thumbnail_url || 'https://via.placeholder.com/300x180?text=Resim+Yok'} 
-                      alt={video.title} 
-                      className="video-img"
-                    />
-                    <div className="play-badge">▶</div>
-                  </div>
-                  <h3 className="video-title-text">{video.title}</h3>
-                </div>
+    <div className="page">
+      <section className="page-hero">
+        <div className="container">
+          <h1>🎬 Sihirli Çocuk Sineması</h1>
+          <p>İzle, öğren ve eğlen. Videolar doğrudan burada oynatılır.</p>
+        </div>
+      </section>
 
-                {/* الوجه الخلفي: الوصف بالتركي وزر المشاهدة */}
-                <div className="video-card-back">
-                  <div className="back-content">
-                    <h3>{video.title}</h3>
-                    {/* نص وصفي افتراضي بالتركي في حال عدم وجود وصف من الـ API */}
-                    <p>{video.description || "Bu harika macerayı keşfetmeye hazır mısın? İyi seyirler dileriz!"}</p>
-                    <a 
-                      href={video.video_url} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="watch-now-btn"
-                    >
-                      Şimdi İzle ✨
-                    </a>
-                  </div>
-                </div>
+      <div className="container page-body">
+        <label className="search-bar">
+          <FaSearch aria-hidden="true" />
+          <input
+            type="search"
+            placeholder="Video ara..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Video ara"
+          />
+        </label>
 
+        {loading && (
+          <div className="state-box"><div className="spinner" />En güzel videolar hazırlanıyor...</div>
+        )}
+
+        {!loading && error && (
+          <div className="state-box"><span className="state-emoji">😕</span>Videolar yüklenemedi. Lütfen daha sonra tekrar dene.</div>
+        )}
+
+        {!loading && !error && filtered.length === 0 && (
+          <div className="state-box"><span className="state-emoji">🔍</span>{query ? 'Aramanla eşleşen video bulunamadı.' : 'Henüz video eklenmemiş.'}</div>
+        )}
+
+        <div className="card-grid">
+          {filtered.map((video) => (
+            <button key={video.id} className="media-card" onClick={() => setPlaying(video)} aria-label={`${video.title} videosunu oynat`}>
+              <div className="media-thumb">
+                <Thumb src={getThumbnail(video)} alt={video.title} />
+                <span className="play-badge"><FaPlay /></span>
               </div>
-            </div>
+              <div className="media-body">
+                <h3 className="media-title">{video.title}</h3>
+                <p className="media-meta">Şimdi izle</p>
+              </div>
+            </button>
           ))}
         </div>
       </div>
+
+      {playing && <VideoModal video={playing} onClose={() => setPlaying(null)} />}
     </div>
   );
 }

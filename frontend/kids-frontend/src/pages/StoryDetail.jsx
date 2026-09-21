@@ -1,88 +1,101 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { FaArrowLeft, FaMoon, FaStar, FaBed } from 'react-icons/fa'; // أيقونات توحي بالنوم
+import { useParams, Link } from 'react-router-dom';
+import { FaArrowLeft, FaMoon, FaStar, FaBed } from 'react-icons/fa';
+import api from '../api';
+import { getThumbnail, getVideoSource, getAudioSource } from '../utils/media';
 import './StoryDetail.css';
 
+// نجوم الخلفية: مواضع ثابتة مشتقة من الفهرس (بدون عشوائية حتى لا تتغير عند كل رسم)
+const STARS = Array.from({ length: 18 }, (_, i) => ({
+  left: `${(i * 37 + 11) % 100}%`,
+  top: `${(i * 53 + 7) % 100}%`,
+  delay: `${(i % 6) * 0.5}s`,
+  size: `${0.7 + (i % 4) * 0.25}rem`,
+}));
+
+// key={id} يعيد تهيئة الحالة عند الانتقال بين قصتين
 export default function StoryDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  return <StoryView key={id} id={id} />;
+}
+
+function StoryView({ id }) {
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStory = async () => {
-      try {
-        setLoading(true);
-        // تأكد من صحة الرابط مع الـ Backend الخاص بك
-        const response = await axios.get(`http://localhost:5000/api/stories/${id}`);
-        setStory(response.data);
-      } catch (err) {
-        console.error("Masal çekme hatası:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStories();
+    let cancelled = false;
+    api.get(`/api/stories/${id}`)
+      .then((res) => { if (!cancelled) setStory(res.data); })
+      .catch(() => { if (!cancelled) setStory(null); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [id]);
 
   if (loading) return (
-    <div className="dream-loading">
+    <div className="dream-state">
       <FaMoon className="spinning-moon" />
-      <span>Tatlı rüyalar hazırlanıyor... 🌌</span>
+      <span>Tatlı rüyalar hazırlanıyor...</span>
     </div>
   );
 
   if (!story) return (
-    <div className="dream-error">
+    <div className="dream-state">
       <FaStar />
       <span>Hoppala! Bu masal uykuya dalmış galiba. Bulamadık.</span>
+      <Link to="/stories" className="btn btn-sun">Masallara Dön</Link>
     </div>
   );
 
+  const cover = getThumbnail(story);
+  const audioSrc = getAudioSource(story);
+  const video = getVideoSource(story);
+  const text = story.content || story.description;
+
   return (
     <div className="story-sleep-wrapper">
-      {/* نجوم خلفية تتلألأ */}
-      {[...Array(20)].map((_, i) => (
-        <div key={i} className={`dream-star star-${i}`}>★</div>
+      {STARS.map((s, i) => (
+        <span key={i} className="dream-star" style={{ left: s.left, top: s.top, animationDelay: s.delay, fontSize: s.size }} aria-hidden="true">★</span>
       ))}
 
-      {/* زر الرجوع للخلف */}
-      <button className="back-to-dreams-btn" onClick={() => navigate('/stories')}>
-        <FaArrowLeft /> Masal Diyarına Dön
-      </button>
+      <div className="container story-inner">
+        <Link to="/stories" className="back-to-dreams-btn"><FaArrowLeft /> Masal Diyarına Dön</Link>
 
-      <div className="story-sleep-card">
-        {/* الجزء العلوي: صورة الغلاف */}
-        <div className="sleep-header-image">
-          <img 
-            src={story.thumbnail_url || 'https://via.placeholder.com/800x400?text=Uyku+Masalı'} 
-            alt={story.title} 
-          />
-          <div className="sleep-overlay-title">
-             <h1>{story.title}</h1>
-             <p className="story-author"><FaBed /> {story.author || 'Kitopia Masalcısı'}</p>
-          </div>
-        </div>
+        <article className="story-sleep-card">
+          <header className={`sleep-header${cover ? '' : ' no-cover'}`}>
+            {cover && <img src={cover} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
+            <div className="sleep-overlay-title">
+              <h1>{story.title}</h1>
+              <p className="story-author"><FaBed /> {story.author || 'Kitopia Masalcısı'}</p>
+            </div>
+          </header>
 
-        <div className="sleep-content-section">
-          {/* مشغل الصوت السحري */}
-          <div className="dream-audio-container">
-            <h3><FaMoon /> Masalı Dinle ve Uyu</h3>
-            <audio controls className="sleep-audio-player">
-              {/* تأكد من صحة رابط الصوت من الـ API */}
-              <source src={`http://localhost:5000/public/${story.audio_path}`} type="audio/mpeg" />
-              Tarayıcınız uyku seslerini desteklemiyor.
-            </audio>
-          </div>
+          <div className="sleep-content-section">
+            {video.kind === 'youtube' && (
+              <div className="story-video">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${video.id}?rel=0&modestbranding=1&playsinline=1`}
+                  title={story.title}
+                  allow="encrypted-media; picture-in-picture; fullscreen"
+                  allowFullScreen
+                />
+              </div>
+            )}
 
-          {/* محتوى القصة */}
-          <div className="dream-text-content">
+            {audioSrc && (
+              <div className="dream-audio-container">
+                <h3><FaMoon /> Masalı Dinle ve Uyu</h3>
+                <audio controls preload="none" className="sleep-audio-player" src={audioSrc}>
+                  Tarayıcınız ses oynatmayı desteklemiyor.
+                </audio>
+              </div>
+            )}
+
             <p className="story-text-body">
-                {story.content || story.description || "Bu masalın sözleri yıldızlara uçmuş! Çok yakında geri dönecekler."}
+              {text || 'Bu masalın sözleri yıldızlara uçmuş! Çok yakında geri dönecekler.'}
             </p>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   );

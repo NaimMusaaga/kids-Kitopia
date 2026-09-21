@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); 
+const path = require('path');
 const errorHandler = require('./middleware/errorHandler');
 
 // استيراد كافة الـ Routes
@@ -12,20 +12,21 @@ const userRoutes = require('./routes/userRoutes');
 const storyRoutes = require('./routes/storyRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
+if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET غير موجود. انسخ .env.example إلى .env وضع فيه قيمة سرية.');
+    process.exit(1);
+}
+
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// إتاحة المجلد 'public' للصور
+// ملفات القصص الصوتية الجاهزة
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// إتاحة المجلد 'public/audio' للأصوات
-const audioPath = path.join(__dirname, 'public', 'audio');
-app.use('/audio', express.static(audioPath));
-
-// [إضافة هامة] إتاحة المجلد 'uploads' للقصص الصوتية المرفوعة
+// الملفات المرفوعة من لوحة التحكم (فيديوهات وقصص صوتية)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // الربط مع كافة المسارات (Endpoints)
